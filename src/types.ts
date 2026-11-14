@@ -1,6 +1,4 @@
 export type WatchStatus = 'planned' | 'watching' | 'completed';
-export type Filter = 'all' | WatchStatus;
-export type Sort = 'added' | 'title' | 'rating';
 
 export interface Anime {
   id: number;

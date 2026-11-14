@@ -17,18 +17,18 @@ export function AnimeDetails({ anime, onClose, onAdd, onUpdate, onDelete, saved 
     <div className="details-layout">
       <aside className="details-aside"><motion.div layoutId={`poster-${anime.id}`} className="details-poster" transition={{ type: 'spring', stiffness: 260, damping: 30 }}><Poster src={anime.poster} title={anime.title} eager /></motion.div><a className="catalog-link" href={`https://myanimelist.net/anime/${anime.id}`} target="_blank" rel="noreferrer">В каталоге MyAnimeList<ExternalLink size={12} /></a></aside>
       <motion.div className="details-content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 0.3 }}>
-        <span className="eyebrow">{entry ? 'В МОЕЙ КОЛЛЕКЦИИ' : 'НОВАЯ ИСТОРИЯ'}</span><h2>{anime.title}</h2><p className="original-title">{anime.originalTitle}</p>
+        <h2>{anime.title}</h2>{anime.originalTitle !== anime.title && <p className="original-title">{anime.originalTitle}</p>}
         <div className="details-meta"><span>{anime.year ?? 'Год не указан'}</span><span>·</span><span>{anime.format}</span><span>·</span><span>{anime.episodes ? `${anime.episodes} эп.` : 'Число серий неизвестно'}</span></div>
         <div className="genre-list">{anime.genres.map(genre => <span key={genre}>{genre}</span>)}</div>
         {anime.synopsis && <div className="synopsis"><p className={expanded ? '' : 'collapsed'}>{anime.synopsis}</p>{anime.synopsis.length > 220 && <button className="text-button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}>{expanded ? 'Свернуть описание' : 'Читать описание'}</button>}</div>}
-        {entry ? <div className="personal-fields"><div><span className="field-label">Моя история</span><StatusSelector value={entry.status} onChange={status => onUpdate({ status })} /></div>
+        {entry ? <div className="personal-fields"><div><StatusSelector value={entry.status} onChange={status => onUpdate({ status })} /></div>
           {entry.status === 'watching' && <EpisodeProgress value={entry.progress} total={entry.episodes} onChange={progress => onUpdate({ progress })} />}
           {entry.status === 'completed' && <div className="finished-note"><Check size={15} />История просмотрена{entry.episodes ? ` · ${entry.episodes} эпизодов` : ''}</div>}
-          <div><span className="field-label">Моя оценка</span><RatingSelector value={entry.rating} onChange={rating => onUpdate({ rating })} /></div>
-          <div><label className="field-label" htmlFor="personal-review">Мои впечатления<span>необязательно</span></label><textarea id="personal-review" rows={3} maxLength={10000} value={entry.review} onChange={e => onUpdate({ review: e.target.value })} placeholder="Что осталось с вами после этой истории?" /></div>
+          <div><span className="field-label">Оценка</span><RatingSelector value={entry.rating} onChange={rating => onUpdate({ rating })} /></div>
+          <div><label className="sr-only" htmlFor="personal-review">Отзыв</label><textarea id="personal-review" rows={3} maxLength={10000} value={entry.review} onChange={e => onUpdate({ review: e.target.value })} placeholder="Отзыв" /></div>
           <div className="details-footer"><span className={`save-note ${saved ? '' : 'unsaved'}`}><span className="status-dot" />{saved ? 'Изменения сохранены' : 'Не сохранено · сделайте экспорт'}</span><button className="icon-button delete-button" onClick={() => setConfirmDelete(true)} aria-label="Удалить аниме из коллекции"><Trash2 size={16} /></button></div>
           {confirmDelete && <div className="delete-confirm" role="alert"><p>Удалить «{anime.title}» вместе с оценкой и отзывом?</p><div><button className="button secondary" onClick={() => setConfirmDelete(false)}>Оставить</button><button className="button danger" onClick={onDelete}>Удалить</button></div></div>}
-        </div> : <div className="preview-add"><p>У каждой истории — своё место.<br />Сохраните её в своей коллекции.</p><button className="button primary" onClick={() => onAdd(anime)}><Plus size={17} />Добавить в коллекцию</button></div>}
+        </div> : <div className="preview-add"><button className="button primary" onClick={() => onAdd(anime)}><Plus size={17} />Добавить</button></div>}
       </motion.div>
     </div>
   </Modal>;

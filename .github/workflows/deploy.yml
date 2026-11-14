@@ -1,0 +1,70 @@
+name: Проверка и публикация сайта
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Проверка и сборка
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Получить исходники
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Установить pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Установить Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Установить зависимости
+        run: pnpm install --frozen-lockfile
+
+      - name: Проверить код
+        run: pnpm lint
+
+      - name: Запустить тесты
+        run: pnpm test
+
+      - name: Собрать приложение
+        run: pnpm build
+
+      - name: Настроить Pages
+        uses: actions/configure-pages@v5
+
+      - name: Загрузить сборку
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Публикация
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Опубликовать сайт
+        id: deployment
+        uses: actions/deploy-pages@v4
