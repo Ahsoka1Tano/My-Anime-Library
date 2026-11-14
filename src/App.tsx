@@ -5,6 +5,7 @@ import type { Anime, LibraryEntry } from './types';
 import { createEntry, updateEntry } from './types';
 import { localLibraryRepository, mergeLibraries, parseLibrary, serializeLibrary } from './lib/storage';
 import { AnimeGrid } from './components/AnimeGrid';
+import { AddAnimeButton } from './components/AddAnimeButton';
 import { AnimeDetails } from './components/AnimeDetails';
 import { AnimeSearch } from './components/AnimeSearch';
 import { Modal } from './components/Modal';
@@ -61,10 +62,14 @@ export default function App() {
 
   return <LayoutGroup><div className="app-shell">
     <input ref={fileInput} type="file" accept=".json,application/json" className="sr-only" aria-label="Файл коллекции для импорта" onChange={e => { void importFile(e.target.files?.[0]); }} />
+    <header className="library-header">
+      <h1 className="library-title">My Anime <span>Library</span></h1>
+      {entries.length > 0 && <AddAnimeButton onClick={add} />}
+    </header>
     <main className={`minimal-library ${entries.length ? 'has-entries' : 'is-empty'}`} aria-label="Моя коллекция">
-      <h1 className="sr-only">My Anime Library</h1>
       {storageError && <div className="storage-warning" role="alert"><p>{storageError}</p><button className="text-button" onClick={exportLibrary}><Download size={15} />Экспортировать</button></div>}
-      <AnimeGrid entries={visible} onAdd={add} onOpen={id => {
+      {entries.length === 0 && <div className="empty-library"><AddAnimeButton onClick={add} /></div>}
+      <AnimeGrid entries={visible} onOpen={id => {
         const anime = entries.find(entry => entry.id === id);
         if (anime) setOverlay({ type: 'details', anime });
       }} />

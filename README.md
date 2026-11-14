@@ -1,6 +1,6 @@
 # My Anime Library
 
-Личная коллекция аниме с простым тёмным интерфейсом: постеры и кнопка «+». React + TypeScript + Vite, Tailwind CSS, Motion for React, Lucide.
+Личная коллекция аниме с простым тёмным интерфейсом: название, постеры и кнопка «+». React + TypeScript + Vite, Tailwind CSS, Motion for React, Lucide.
 
 [Открыть сайт](https://ahsoka1tano.github.io/My-Anime-Library/)
 
@@ -26,7 +26,7 @@ pnpm dev
 
 ## Возможности
 
-- При первом запуске — только «+» по центру экрана. Нажатие открывает поиск. После добавления на экране остаются постеры и плитка «+», без шапки, баннера, подписей и счётчиков.
+- Слева сверху — название My Anime Library шрифтом Cormorant Garamond. Пока коллекция пустая, «+» находится по центру экрана; после первого добавления он плавно перемещается вправо вверх. Нажатие открывает поиск. У постеров нет подписей и счётчиков.
 - Поиск на английском и японском через **AniList GraphQL**, на русском через **Shikimori GraphQL**. Ключи API не нужны. Запрос и название аниме передаются соответствующему каталогу; отзывы и оценки остаются в браузере.
 - Debounce 550 мс, отмена устаревших запросов, очередь с интервалом 1,1 с, кеш на 5 минут и ограниченная повторная попытка при HTTP 429. Ошибки, отсутствие результатов и медленный ответ отображаются явно. Выдуманных результатов при ошибке нет.
 - Добавление с защитой от дублей по **MyAnimeList ID** — одному идентификатору для обоих каталогов.
@@ -64,7 +64,7 @@ pnpm dev
 
 ```text
 src/
-  components/          AnimeGrid, AnimeCard, AnimeDetails, AnimeSearch,
+  components/          AddAnimeButton, AnimeGrid, AnimeCard, AnimeDetails, AnimeSearch,
                        StatusSelector, RatingSelector, EpisodeProgress,
                        Modal, Poster
   lib/api.ts           Каталоги, нормализация, кеш, очередь, обработка ошибок
@@ -74,6 +74,7 @@ src/
   App.tsx              Состояние коллекции и композиция экранов
   styles.css           Тема и адаптивные стили
 public/
+  fonts/               Локальный шрифт заголовка и его лицензия SIL OFL
   favicon.svg          Иконка приложения
 ```
 
@@ -108,5 +109,6 @@ GitHub Pages публикуется автоматически после push �
 - [AniList GraphQL API](https://docs.anilist.co/) — поиск, метаданные и постеры.
 - [Shikimori API](https://shikimori.one/api/doc/graphql) — русский поиск и метаданные.
 - [Motion: layout animations](https://motion.dev/docs/react-layout-animations).
+- [Cormorant Garamond](https://github.com/google/fonts/tree/main/ofl/cormorantgaramond) — шрифт заголовка, SIL Open Font License. В проект включён небольшой файл со знаками названия; внешних запросов к Google Fonts при открытии сайта нет.
 
 Постеры принадлежат их правообладателям; права на них не передаются вместе с исходным кодом приложения.
