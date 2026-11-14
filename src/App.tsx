@@ -4,6 +4,7 @@ import { Check, Download, Upload, X } from 'lucide-react';
 import type { Anime, LibraryEntry } from './types';
 import { createEntry, updateEntry } from './types';
 import { localLibraryRepository, mergeLibraries, parseLibrary, serializeLibrary } from './lib/storage';
+import { reorderEntries } from './lib/order';
 import { AnimeGrid } from './components/AnimeGrid';
 import { AddAnimeButton } from './components/AddAnimeButton';
 import { AnimeDetails } from './components/AnimeDetails';
@@ -57,7 +58,6 @@ export default function App() {
     } catch (error) { notify(error instanceof Error ? error.message : 'Не удалось прочитать файл.'); }
     finally { if (fileInput.current) fileInput.current.value = ''; }
   }
-  const visible = [...entries].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
   const selected = overlay?.type === 'details' ? entries.find(a => a.id === overlay.anime.id) || overlay.anime : null;
 
   return <LayoutGroup><div className="app-shell">
@@ -69,7 +69,7 @@ export default function App() {
     <main className={`minimal-library ${entries.length ? 'has-entries' : 'is-empty'}`} aria-label="Моя коллекция">
       {storageError && <div className="storage-warning" role="alert"><p>{storageError}</p><button className="text-button" onClick={exportLibrary}><Download size={15} />Экспортировать</button></div>}
       {entries.length === 0 && <div className="empty-library"><AddAnimeButton onClick={add} /></div>}
-      <AnimeGrid entries={visible} onOpen={id => {
+      <AnimeGrid entries={entries} onReorder={(activeId, overId) => persist(reorderEntries(entries, activeId, overId))} onOpen={id => {
         const anime = entries.find(entry => entry.id === id);
         if (anime) setOverlay({ type: 'details', anime });
       }} />

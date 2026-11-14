@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createEntry, updateEntry } from '../types';
 import type { Anime } from '../types';
 import { mergeLibraries, parseLibrary, serializeLibrary } from './storage';
+import { reorderEntries } from './order';
 
 const anime: Anime = { id: 52991, title: 'Фрирен', originalTitle: '葬送のフリーレン', poster: 'https://example.com/poster.jpg', year: 2023, genres: ['Фэнтези'], episodes: 28, synopsis: 'История', format: 'Сериал' };
 const entry = createEntry(anime);
@@ -61,5 +62,28 @@ describe('Импорт и экспорт', () => {
   });
   it('не принимает файл частично, если одна запись повреждена', () => {
     expect(() => parseLibrary(JSON.stringify({ version: 1, entries: [entry, { ...entry, id: 2, rating: 0 }] }))).toThrow();
+  });
+});
+
+describe('Ручной порядок коллекции', () => {
+  it('сохраняет перестановку в JSON без потери личных данных', () => {
+    const personal = updateEntry(entry, { status: 'watching', progress: 7, rating: 9, review: 'Сохранить отзыв' });
+    const original = [personal, { ...entry, id: 1 }, { ...entry, id: 2 }, { ...entry, id: 3 }];
+    const reordered = reorderEntries(original, personal.id, 2);
+    const restored = parseLibrary(serializeLibrary(reordered)).entries;
+    expect(restored.map(item => item.id)).toEqual([1, 2, personal.id, 3]);
+    expect(restored.find(item => item.id === personal.id)).toEqual(personal);
+    expect(original.map(item => item.id)).toEqual([personal.id, 1, 2, 3]);
+    expect(mergeLibraries([], restored)).toEqual(restored);
+  });
+  it('перемещает последнюю запись в начало и сохраняет остальные в их порядке', () => {
+    const original = [entry, { ...entry, id: 1 }, { ...entry, id: 2 }];
+    expect(reorderEntries(original, 2, entry.id).map(item => item.id)).toEqual([2, entry.id, 1]);
+  });
+  it('не теряет записи при неизвестной цели или переносе на себя', () => {
+    const original = [entry, { ...entry, id: 1 }];
+    expect(reorderEntries(original, entry.id, 999)).toBe(original);
+    expect(reorderEntries(original, 999, entry.id)).toBe(original);
+    expect(reorderEntries(original, entry.id, entry.id)).toBe(original);
   });
 });
